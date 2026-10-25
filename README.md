@@ -12,5 +12,6 @@
 | Узлы | 28 | 11 | 11 | 0 |
 | Связи | 48 | 28 | 28| 0 |
 
-Модель, извлеченная экстрактором
-Эталон в части покрываемой реализованными правилами
+### Модель, извлеченная экстрактором <img width="869" height="625" alt="extracted_model" src="https://github.com/user-attachments/assets/fd3f05b0-d284-43e5-bf3c-6cf135d51c1e" />
+
+### Эталонная модель (только реализованные правила) <img width="703" height="642" alt="reference_model" src="https://github.com/user-attachments/assets/ca9ccb9c-6da3-4af4-a414-6b505119af7b" />
