@@ -1,0 +1,15 @@
+name: archviz
+
+services:
+  neo4j:
+    image: neo4j:2026
+    ports:
+      - "7474:7474"
+      - "7687:7687"
+    environment:
+      - NEO4J_AUTH=neo4j/archviz-pass
+    volumes:
+      - neo4j-data:/data
+
+volumes:
+  neo4j-data:

@@ -1,0 +1,119 @@
+name: library
+
+services:
+  gateway:
+    build: ./services/gateway
+    ports: 
+      - "8080:8000"
+    environment:
+      USERS_URL: http://users:8000
+      CATALOG_URL: http://books:8000
+      HOLDS_URL: http://holds:8000
+      REPORTS_URL: http://reports:8000
+    depends_on:
+      - users
+      - catalog
+      - holds
+    networks:
+      - frontend
+      - backend
+
+  users:
+    build: ./services/users
+    environment: 
+      DB_URL: postgresql://users:pass@users-db:5432/users
+      REDIS_HOST: cache
+    depends_on:
+      - users-db
+      - cache
+    networks:
+      - backend
+
+  catalog:
+    build: ./services/catalog
+    environment:
+      MONGO_URI: mongodb://catalog-db:27017/catalog
+    depends_on:
+      - catalog-db
+    networks:
+      backend:
+        aliases:
+          - books
+
+  holds:
+    build: ./services/holds
+    environment:
+      DB_HOST: holds-db
+      DB_NAME: holds
+      AMQP_URL: amqp://guest:guest@broker:5672/
+    depends_on: 
+      holds-db:
+        condition: service_healthy
+      broker:
+        condition: service_started
+    networks:
+      - backend
+  
+  notifications:
+    build: ./services/notifications
+    environment:
+      AMQP_URL: amqp://guest:guest@broker:5672/
+      EMAIL_API_URL: https://api.mail.example.com
+    depends_on:
+      - broker
+    networks:
+      - backend
+  
+  users-db: 
+    image: postgres:18
+    environment:
+      - POSTGRES_USER=users
+      - POSTGRES_PASSWORD=pass
+      - POSTGRES_DB=users
+    volumes:
+      - users-data:/var/lib/postgresql
+    networks:
+      - backend
+  
+  holds-db:
+    image: postgres:18
+    environment:
+      POSTGRES_USER: holds
+      POSTGRES_PASSWORD: pass
+      POSTGRES_DB: holds
+    volumes:
+      - holds-data:/var/lib/postgresql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U holds"]
+      interval: 5s
+      retries: 5
+    networks:
+      - backend
+
+  catalog-db:
+    image: mongo:9.0.4
+    volumes:
+      - catalog-data:/data/db
+    networks:
+      - backend
+  
+  cache:
+    image: redis:8
+    networks:
+      - backend
+  
+  broker: 
+    image: rabbitmq:4.4-management
+    ports:
+      - "15672:15672"
+    networks:
+      - backend
+  
+volumes:
+  users-data:
+  holds-data:
+  catalog-data:
+  
+networks:
+  frontend:
+  backend:
