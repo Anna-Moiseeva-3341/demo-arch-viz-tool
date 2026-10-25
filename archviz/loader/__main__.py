@@ -61,9 +61,12 @@ def main():
     parser.add_argument("--user", default="neo4j")
     parser.add_argument("--password", default=os.getenv("NEO4J_PASSWORD", "archviz-pass"))
     parser.add_argument("--keep", action="store_true", help="не удалять предыдущую загрузку приложения")
+    parser.add_argument("--application", help="загрузить под другим именем приложения")
     args = parser.parse_args()
 
     model = json.loads(args.model.read_text(encoding="utf-8"))
+    if args.application:
+        model["application"] = args.application
     with GraphDatabase.driver(args.uri, auth=(args.user, args.password)) as driver:
         driver.verify_connectivity()
         with driver.session() as session:
