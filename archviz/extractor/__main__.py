@@ -10,8 +10,8 @@ from .model import Graph
 SCHEMA_VERSION = "0.1"
 
 def main():
-    parser = argparse.ArgumentParser(prog="extractor", description="Извлечение архитектурной модели из артефактов проекта")
-    parser.add_argument("project", type=Path, help="каталог анализируемого проекта")
+    parser = argparse.ArgumentParser()
+    parser.add_argument("project", type=Path)
     parser.add_argument("-o", "--output", type=Path, default=Path("out/model.json"))
     args = parser.parse_args()
 
